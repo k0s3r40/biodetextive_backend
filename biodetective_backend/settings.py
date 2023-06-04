@@ -99,6 +99,18 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+if os.getenv("DB_PASSWORD", None):
+
+    DATABASES = {
+        "default":{
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'ecodex',
+            'USER': 'ecodex',
+            "PASSWORD": os.getenv("DB_PASSWORD"),
+            "HOST": "dbvitrinabgprod-do-user-1085290-0.b.db.ondigitalocean.com",
+            "PORT": '25060'
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
