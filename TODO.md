@@ -1,0 +1,6 @@
+- Login
+- Register
+- TokenAuth
+- ImageRecognition
+- ListSpecimens
+- Map
