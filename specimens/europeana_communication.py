@@ -36,7 +36,7 @@ def get_random_element(elements):
     return {
         'name': name,
         'image': image_as_b64,
-        'description': get_openai_data([{'role': 'user', 'content': f'Describe {name}'}])
+        'description': get_openai_data([{'role': 'user', 'content': f'Describe {name} up to 10 words'}])
     }
 
 

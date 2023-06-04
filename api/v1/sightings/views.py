@@ -50,7 +50,7 @@ class SightingApiView(APIView):
         serializer.is_valid(raise_exception=True)
         image = serializer.validated_data.get('image')
         title = analyze_image_with_cloud_vision(image)
-        description = get_openai_data([{'role': 'user', 'content': f"Give me a short description of {title} if it's an animal. If it's a landmark, add interesting info up to 50 words."}])
+        description = get_openai_data([{'role': 'user', 'content': f"Give me a short description of {title} up to 50 words."}])
         category = get_openai_data([{'role': 'user', 'content': f"In one word, what is '{title}'? {','.join(i[0] for i in Specimen.SPECIMEN_CATEGORIES)}"}])
         specimen = Specimen.objects.filter(name=title).first()
         if not specimen:

@@ -5,6 +5,7 @@ from django.conf import settings
 OPENAI_KEY = settings.OPENAI_KEY
 
 def get_openai_data(messages):
+    print('hitting open ai')
     headers = {'Authorization': f"Bearer {OPENAI_KEY}", "Content-Type": "application/json"}
     request_body = {
         'model': 'gpt-3.5-turbo',

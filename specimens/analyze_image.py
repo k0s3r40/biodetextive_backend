@@ -68,7 +68,5 @@ def analyze_image_with_cloud_vision(image: str):
     url = f'https://vision.googleapis.com/v1/images:annotate?key={api_key}'
 
     response = requests.post(url, headers=headers, data=json.dumps(payload))
-    return get_openai_data([{'role': 'user', 'content': f"Give me a simple answer only name preferably specie or landmark object of what is on that picture:\n{json.dumps(response.json())}"
-                                                         f" If there is slight possibility if specie give me the specie and dont sound like an ai be sertain. Make it like a title."
-                                                         f"If is an animal or plant give the breed or the name off the plant and people should not know you are an ai"}])
+    return get_openai_data([{'role': 'user', 'content': f" Animal Plant Mushroom or landmark give me the name \n{json.dumps(response.json())}"}])
 
