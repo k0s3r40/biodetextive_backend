@@ -33,10 +33,13 @@ def get_random_element(elements):
     random_element = random.choice(elements)
     name = random_element.get('name')
     image_as_b64 = base64.b64encode(requests.get(random_element['image']).content).decode('utf-8')
+    google_response = requests.get(f'https://customsearch.googleapis.com/customsearch/v1?cx=001928687561571394193%3At_qhgoibaiq&num=2&q={parse.quote(name)}%20description&key={settings.GOOGLE_API_KEY}')
+    description = get_openai_data([{'role': 'user', 'content': f"A person took a picture of a {name} google returned {google_response.json()}, extract the description from here and summarize it up to 50 words I need description of the thing. Take the risk no explanations just the description. And do not mention anything about search results and dont mention google."}])
+
     return {
         'name': name,
         'image': image_as_b64,
-        'description': get_openai_data([{'role': 'user', 'content': f'Describe {name} up to 10 words'}])
+        'description': description
     }
 
 

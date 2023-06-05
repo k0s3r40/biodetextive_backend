@@ -1,3 +1,5 @@
+from urllib import parse
+
 from django.http import HttpResponse, FileResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
@@ -7,12 +9,14 @@ from api.v1.sightings.serializers import (
     SpecimenSightingSerializer,
     SpecimenSightingLimitedSerializerWithImage
 )
+import requests
 from specimens.analyze_image import analyze_image_with_cloud_vision
 from specimens.europeana_communication import get_data_from_europeana
 from specimens.models import Specimen, SpecimenSighting
 from specimens.open_api_communication import get_openai_data
 from django.utils import timezone
 import io
+from django.conf import settings
 
 
 class EuropeanaDiscoverApiView(APIView):
@@ -50,7 +54,8 @@ class SightingApiView(APIView):
         serializer.is_valid(raise_exception=True)
         image = serializer.validated_data.get('image')
         title = analyze_image_with_cloud_vision(image)
-        description = get_openai_data([{'role': 'user', 'content': f"Give me a short description of {title} up to 50 words."}])
+        google_response = requests.get(f'https://customsearch.googleapis.com/customsearch/v1?cx=001928687561571394193%3At_qhgoibaiq&num=2&q={parse.quote(title)}%20description&key={settings.GOOGLE_API_KEY}')
+        description = get_openai_data([{'role': 'user', 'content': f"A person took a picture of a {title} google returned {google_response.json()}, extract the description from here and summarize it up to 50 words I need description of the thing. Take the risk no explanations just the description."}])
         category = get_openai_data([{'role': 'user', 'content': f"In one word, what is '{title}'? {','.join(i[0] for i in Specimen.SPECIMEN_CATEGORIES)}"}])
         specimen = Specimen.objects.filter(name=title).first()
         if not specimen:

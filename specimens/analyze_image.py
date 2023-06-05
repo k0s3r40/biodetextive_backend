@@ -15,46 +15,16 @@ def analyze_image_with_cloud_vision(image: str):
             {
                 "features": [
                     {
-                        "maxResults": 50,
+                        "maxResults": 20,
                         "type": "LANDMARK_DETECTION"
                     },
                     {
                         "maxResults": 50,
-                        "type": "FACE_DETECTION"
-                    },
-                    {
-                        "maxResults": 50,
-                        "type": "OBJECT_LOCALIZATION"
-                    },
-                    {
-                        "maxResults": 50,
-                        "type": "LOGO_DETECTION"
-                    },
-                    {
-                        "maxResults": 50,
                         "type": "LABEL_DETECTION"
-                    },
-                    {
-                        "maxResults": 50,
-                        "model": "builtin/latest",
-                        "type": "DOCUMENT_TEXT_DETECTION"
-                    },
-                    {
-                        "maxResults": 50,
-                        "type": "SAFE_SEARCH_DETECTION"
-                    },
-                    {
-                        "maxResults": 50,
-                        "type": "IMAGE_PROPERTIES"
-                    },
-                    {
-                        "maxResults": 50,
-                        "type": "CROP_HINTS"
                     }
                 ],
                 "image": {
                     "content": image
-
                 },
             }
         ]
@@ -68,5 +38,17 @@ def analyze_image_with_cloud_vision(image: str):
     url = f'https://vision.googleapis.com/v1/images:annotate?key={api_key}'
 
     response = requests.post(url, headers=headers, data=json.dumps(payload))
-    return get_openai_data([{'role': 'user', 'content': f" Animal Plant Mushroom or landmark give me the name \n{json.dumps(response.json())}"}])
+    print(response.json())
+    data = []
+    for i in response.json().get('responses'):
+        for x in i.get('labelAnnotations', []):
+            data.append(x.get('description'))
+        for x in i.get('landmarkAnnotations', []):
+            data.append(x.get('description'))
 
+    request_body = [
+        {"role": "system", "content": 'You are part of image recognition app and you can parse json with labels on the picture. Give title of the picture based on whatever the json gives you.'
+                                      'describe what is on the picture'},
+        {"role": "user", "content": f"From here {data}. A person took up closeup picture of this he does not know what this is  pick one that is some kind of species or a landmark they are usually on the top and output just the name. Just output one label no need of explanation"}
+    ]
+    return get_openai_data(request_body)
