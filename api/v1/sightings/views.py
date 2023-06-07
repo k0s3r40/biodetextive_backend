@@ -55,11 +55,13 @@ class SightingApiView(APIView):
         image = serializer.validated_data.get('image')
         title = analyze_image_with_cloud_vision(image)
         google_response = requests.get(f'https://customsearch.googleapis.com/customsearch/v1?cx=001928687561571394193%3At_qhgoibaiq&num=2&q={parse.quote(title)}%20description&key={settings.GOOGLE_API_KEY}')
-        description = get_openai_data([{'role': 'user', 'content': f"A person took a picture of a {title} google returned {google_response.json()}, extract the description from here and summarize it up to 50 words I need description of the thing. Take the risk no explanations just the description."}])
-        category = get_openai_data([{'role': 'user', 'content': f"In one word, what is '{title}'? {','.join(i[0] for i in Specimen.SPECIMEN_CATEGORIES)}"}])
+        description = get_openai_data(
+            [{'role': 'user', 'content': f"A person took a picture of a {title} google returned {google_response.json()}, extract the description from here and summarize it up to 50 words I need description of the thing. Take the risk no explanations just the description."}])
+        category = get_openai_data([{'role': 'user', 'content': f"In one word, what is '{title}'? Choose from and dont add additives like dots or sth {','.join(i[0] for i in Specimen.SPECIMEN_CATEGORIES)}"}]).strip('.! ')
+        specimen_class = get_openai_data([{'role': 'user', 'content': f"In one word, rate the rarity of seeing '{title}'? {','.join(i[0] for i in Specimen.SPECIMEN_CLASSES)}"}])
         specimen = Specimen.objects.filter(name=title).first()
         if not specimen:
-            specimen = Specimen.objects.create(name=title, description=description, category=category)
+            specimen = Specimen.objects.create(name=title.strip('\"\''), specimen_class=specimen_class.strip('.').strip(' '), description=description, category=category.strip('.!'))
         lat = float(serializer.validated_data.get('lat'))
         lon = float(serializer.validated_data.get('lon'))
         europeana_data = get_data_from_europeana(lat, lon)

@@ -12,6 +12,14 @@ class Specimen(models.Model):
         ('MUSHROOM', _('гъба')),
         ('ANIMAL', _('животно')),
         ('INSECT', _('насекомо')),
+        ('OTHER', _('друг'))
+
+    ]
+    SPECIMEN_CLASSES = [
+        ('COMMON', _('често срещано')),
+        ('RARE', _('рядко срещано')),
+        ('EPIC', _('епично')),
+        ('LEGENDARY', _('легендарно')),
     ]
 
     class Meta:
@@ -21,6 +29,7 @@ class Specimen(models.Model):
     name = models.CharField(max_length=255, blank=False, null=False, verbose_name=_('име'))
     points = models.IntegerField(default=0, verbose_name=_('точки'))
     category = models.CharField(max_length=10, choices=SPECIMEN_CATEGORIES, verbose_name=_('тип'))
+    specimen_class = models.CharField(max_length=10, choices=SPECIMEN_CLASSES, verbose_name=_('клас'))
     description = models.TextField()
 
 
@@ -43,4 +52,8 @@ class SpecimenSighting(models.Model):
         image_bytes = base64.b64decode(self.image)
         image = Image.open(io.BytesIO(image_bytes))
         return image
+
+    @property
+    def specimen_class(self):
+        return self.specimen.specimen_class
 

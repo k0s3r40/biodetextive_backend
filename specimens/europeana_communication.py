@@ -58,5 +58,6 @@ def get_data_from_europeana(lat, lon, only_one=True):
         "wskey": API_KEY
     }
     response = requests.get(f"{BASE_URL}?{parse.urlencode(query_params)}")
+    print(response.json())
     response.raise_for_status()  # raises an HTTPError if the response status is 4xx, 5xx
     return parse_data(response.json(), only_one=only_one)

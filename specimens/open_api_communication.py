@@ -18,6 +18,7 @@ def get_openai_data(messages):
     # print(request_body)
     try:
         response = requests.post('https://api.openai.com/v1/chat/completions', json=request_body, headers=headers)
+        print(response.json())
         response.raise_for_status()  # raise an error if the response status code is not 200
         json_data = response.json()
 
